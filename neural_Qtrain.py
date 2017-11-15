@@ -76,6 +76,19 @@ def get_network(state_dim, action_dim, hidden_nodes=HIDDEN_NODES):
     # which are the network's esitmation of the Q values for those actions and the
     # input state. The final layer should be assigned to the variable q_values
 
+    
+    net = tf.layers.dense(state_in, 16, kernel_initializer=xavier_init, activation=tf.nn.elu)
+    net = tf.layers.dense(net, 64, kernel_initializer=xavier_init, activation=tf.nn.elu)
+    net = tf.layers.dense(net, 32, kernel_initializer=xavier_init, activation=tf.nn.elu)
+    Qout = tf.layers.dense(net, 2)
+    q_values = tf.argmax(Qout, 1)
+
+    q_selected_action = tf.reduce_sum(tf.multiply(q_values, action_in), reduction_indices=1)
+    # TO IMPLEMENT: loss function
+    # should only be one line, if target_in is implemented correctly
+    loss = tf.losses.mean_squared_error(lbl_one_hot, Qout)
+    optimise_step = tf.train.AdamOptimizer().minimize(loss)
+
     train_loss_summary_op = tf.summary.scalar("TrainingLoss", loss)
     return state_in, action_in, target_in, q_values, q_selected_action, \
            loss, optimise_step, train_loss_summary_op
