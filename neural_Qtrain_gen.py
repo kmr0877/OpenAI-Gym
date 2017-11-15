@@ -2,6 +2,14 @@ import sys
 import gym
 import tensorflow as tf
 
+"""
+Hyper Parameters
+"""
+GAMMA = 0.9  # discount factor for target Q
+INITIAL_EPSILON = 0.6  # starting value of epsilon
+FINAL_EPSILON = 0.1  # final value of epsilon
+EPSILON_DECAY_STEPS = 100
+
 def init(env, env_name):
     """
     Initialise any globals, e.g. the replay_buffer, epsilon, etc.
@@ -41,6 +49,17 @@ def get_network(state_dim, action_dim, hidden_nodes=HIDDEN_NODES):
     2) You will set `target_in` in `get_train_batch` further down. Probably best
     to implement that before implementing the loss .from there on you can figure it out easily
     """
+
+def init_session():
+    global session, writer
+    session = tf.InteractiveSession()
+    session.run(tf.global_variables_initializer())
+
+    # Setup Logging
+    logdir = "tensorboard/" + datetime.datetime.now().strftime(
+        "%Y%m%d-%H%M%S") + "/"
+    writer = tf.summary.FileWriter(logdir, session.graph)
+
 
 def get_train_batch(q, t,state_in, action_in, target_in,replay_buffer):
     """
