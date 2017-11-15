@@ -64,25 +64,17 @@ def get_network(state_dim, action_dim, hidden_nodes=HIDDEN_NODES):
     2) You will set `target_in` in `get_train_batch` further down. Probably best
     to implement that before implementing the loss (there are further hints there)
     """
+    num_classes = 2
     state_in = tf.placeholder("float", [None, state_dim])
-    action_in = tf.placeholder("float", [None, action_dim])  # one hot
-
+    action_in = tf.placeholder("int64", [None, action_dim])  # one hot
+    he_init = tf.contrib.layers.variance_scaling_initializer()
+    xavier_init = tf.contrib.layers.xavier_initializer()
     # q value for the target network for the state, action taken
-    target_in = tf.placeholder("float", [None])
-
+    target_in = tf.placeholder("int64", [None])
+    lbl_one_hot = tf.one_hot(target_in, 2, 1.0, 0.0)
     # TO IMPLEMENT: Q network, whose input is state_in, and has action_dim outputs
     # which are the network's esitmation of the Q values for those actions and the
     # input state. The final layer should be assigned to the variable q_values
-    ...
-    q_values = ...
-
-    q_selected_action = \
-        tf.reduce_sum(tf.multiply(q_values, action_in), reduction_indices=1)
-
-    # TO IMPLEMENT: loss function
-    # should only be one line, if target_in is implemented correctly
-    loss = ...
-    optimise_step = tf.train.AdamOptimizer().minimize(loss)
 
     train_loss_summary_op = tf.summary.scalar("TrainingLoss", loss)
     return state_in, action_in, target_in, q_values, q_selected_action, \
